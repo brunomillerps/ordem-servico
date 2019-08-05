@@ -1,0 +1,59 @@
+entity Equipamento {
+    descricao BLOB required
+}
+
+entity Anexo {
+	arquivo BLOB required,
+    nomeArquivo String required
+}
+
+entity Comentario {
+	dataHora Instant required,
+    comentario BLOB required
+}
+
+entity OrdemServico {
+    // Data Hora em que a OS foi criada
+    dataHora Instant required,
+    solicitacao String required,
+    descricao BLOB,
+    // Data/Hora de inicio que o usuario precisa
+    dataHoraInicioRequisitada Instant,
+    // Dara/Hora de inicio de fato
+    dataHoraInicioEfetiva Instant,
+    // Data/Hora de término que o usuario precisa
+    dataHoraFimRequisitada Instant,
+    // Data/Hora de término prevista pelo operador
+    dataHoraFimPrevista Instant
+    // Data/Hora de término efetiva
+    dataHoraFimEfetiva Instant
+}
+
+enum StatusOS {
+	NAO_INICIADO, EM_ANDAMENTO, CONCLUIDO
+}
+
+relationship OneToMany {
+	OrdemServico{equipamentos} to Equipamento,
+    OrdemServico{comentarios} to Comentario,
+    OrdemServico{anexos} to Anexo
+}
+
+relationship ManyToOne {
+	OrdemServico{requisitante} to User,
+    OrdemServico{operador} to User,
+    Comentario{comentadoPor} to User,
+    OrdemServico{status} to StatusOS 
+}
+
+// Set pagination options
+paginate OrdemServico, Equipamento with infinite-scroll
+
+// Use Data Transfert Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
